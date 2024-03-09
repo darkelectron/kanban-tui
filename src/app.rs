@@ -227,7 +227,7 @@ impl App {
     pub fn done_editing(&mut self) {
         self.mode = AppMode::Main;
     }
-    pub fn cancel_editing(&mut self) {
+    pub fn cancel_card_edit(&mut self) {
         self.lists[self.col][self.row] = self.prev_val.clone();
         self.mode = AppMode::Main;
     }
@@ -250,6 +250,38 @@ impl App {
             return;
         }
         self.lists[self.col].remove(self.row);
+        self.update_selection();
+    }
+
+    // Edit List
+    pub fn edit_list(&mut self) {
+        self.mode = AppMode::ListEdit;
+        self.prev_val = self.list().name.clone();
+    }
+    pub fn type_list(&mut self, c: char) {
+        self.lists[self.col].name.push(c);
+    }
+    pub fn backspace_list(&mut self) {
+        self.lists[self.col].name.pop();
+    }
+    pub fn cancel_list_edit(&mut self) {
+        self.lists[self.col].name = self.prev_val.clone();
+        self.mode = AppMode::Main;
+    }
+    pub fn append_list(&mut self) {
+        self.col += 1;
+        self.lists.insert(self.col, CardList::new());
+        self.edit_list();
+    }
+    pub fn prepend_list(&mut self) {
+        self.lists.insert(self.col, CardList::new());
+        self.edit_list();
+    }
+    pub fn remove_list(&mut self) {
+        if self.cols() == 1 {
+            return;
+        }
+        self.lists.remove(self.col);
         self.update_selection();
     }
 }

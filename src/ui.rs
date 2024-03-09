@@ -24,6 +24,7 @@ pub fn render(app: &App, frame: &mut Frame) {
     );
 
     // Lists and cards
+    // TODO: Slice lists
     let list_rects = Layout::horizontal(vec![Constraint::Length(40); app.lists().len()])
         .margin(1)
         .spacing(1)
@@ -32,6 +33,11 @@ pub fn render(app: &App, frame: &mut Frame) {
         .iter()
         .enumerate()
         .for_each(|(list_index, list)| {
+            let list_title = if app.col() == list_index && app.mode() == AppMode::ListEdit {
+                format!("{}_ ", list.name())
+            } else {
+                format!("{} ", list.name())
+            };
             frame.render_widget(
                 List::new(list.cards().iter().enumerate().map(|(card_index, card)| {
                     let is_selected = card_index == app.row() && list_index == app.col();
@@ -47,7 +53,7 @@ pub fn render(app: &App, frame: &mut Frame) {
                 }))
                 .block(
                     Block::bordered()
-                        .title(Title::from(list.name()).alignment(Alignment::Left))
+                        .title(Title::from(list_title).alignment(Alignment::Left))
                         .title(Title::from(list.len().to_string()).alignment(Alignment::Right))
                         .fg(if list_index == app.col() {
                             Color::LightRed
@@ -60,6 +66,7 @@ pub fn render(app: &App, frame: &mut Frame) {
         });
 
     // Footer
+    // TODO: Keybindings for each mode
     frame.render_widget(
         Paragraph::new(match app.mode() {
             AppMode::Main => "Main",

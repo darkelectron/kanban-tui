@@ -27,6 +27,12 @@ pub fn handle_key_events(ev: KeyEvent, app: &mut App) -> AppResult<()> {
             KeyCode::Char('j') | KeyCode::Down => app.motion_down(),
             KeyCode::Char('k') | KeyCode::Up => app.motion_up(),
             KeyCode::Char('l') | KeyCode::Right => app.motion_right(),
+            // CRUD Operations On Lists
+            // AIEX: Append/Prepend/Edit/Delete a list
+            KeyCode::Char('A') if ev.modifiers == KeyModifiers::SHIFT => app.append_list(),
+            KeyCode::Char('I') if ev.modifiers == KeyModifiers::SHIFT => app.prepend_list(),
+            KeyCode::Char('E') if ev.modifiers == KeyModifiers::SHIFT => app.edit_list(),
+            KeyCode::Char('X') if ev.modifiers == KeyModifiers::SHIFT => app.remove_list(),
             // CRUD Operations on Cards
             // aiex: Append/Prepend/Edit/Delete a card
             KeyCode::Char('a') => app.append_card(),
@@ -40,25 +46,18 @@ pub fn handle_key_events(ev: KeyEvent, app: &mut App) -> AppResult<()> {
         },
         AppMode::CardEdit => match ev.code {
             KeyCode::Enter => app.done_editing(),
-            KeyCode::Esc => app.cancel_editing(),
+            KeyCode::Esc => app.cancel_card_edit(),
             KeyCode::Backspace => app.backspace_card(),
             KeyCode::Char(c) => app.type_card(c),
             _ => {}
         },
-        _ => {}
+        AppMode::ListEdit => match ev.code {
+            KeyCode::Enter => app.done_editing(),
+            KeyCode::Esc => app.cancel_list_edit(),
+            KeyCode::Backspace => app.backspace_list(),
+            KeyCode::Char(c) => app.type_list(c),
+            _ => {}
+        },
     };
-    /*
-    Ctrl+H Ctrl+L: Move List
-
-    AI: Append/Prepend a list
-
-    E: Edit List
-
-    d: Delete card
-    D: Delete List
-
-    f: fuzzy find card
-    F: fuzzy find list
-    */
     Ok(())
 }
