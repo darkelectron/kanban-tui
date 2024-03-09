@@ -15,7 +15,7 @@ fn main() -> AppResult<()> {
     let mut tui = Tui::new(terminal, events);
     tui.init()?;
 
-    while app.running {
+    while app.running() {
         tui.draw(&app)?;
         match tui.events.next()? {
             Event::Tick => app.tick(),

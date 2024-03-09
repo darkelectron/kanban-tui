@@ -1,7 +1,7 @@
 use std::error;
 pub type AppResult<T> = std::result::Result<T, Box<dyn error::Error>>;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum AppMode {
     Main,
     CardEdit,
@@ -10,12 +10,12 @@ pub enum AppMode {
 
 #[derive(Debug)]
 pub struct App {
-    pub running: bool,
-    pub lists: Vec<Vec<String>>,
-    pub row: usize,
-    pub col: usize,
-    pub mode: AppMode,
-    pub prev_val: String,
+    running: bool,
+    lists: Vec<Vec<String>>,
+    row: usize,
+    col: usize,
+    mode: AppMode,
+    prev_val: String,
 }
 
 impl Default for App {
@@ -43,6 +43,30 @@ impl App {
     pub fn new() -> Self {
         Self::default()
     }
+    pub fn mode(&self) -> AppMode {
+        self.mode
+    }
+    pub fn lists(&self) -> &[Vec<String>] {
+        &self.lists
+    }
+    pub fn list(&self) -> &[String] {
+        &self.lists[self.col]
+    }
+    pub fn row(&self) -> usize {
+        self.row
+    }
+    pub fn rows(&self) -> usize {
+        self.list().len()
+    }
+    pub fn col(&self) -> usize {
+        self.col
+    }
+    pub fn cols(&self) -> usize {
+        self.lists.len()
+    }
+    pub fn running(&self) -> bool {
+        self.running
+    }
 
     pub fn tick(&self) {}
 
@@ -51,8 +75,8 @@ impl App {
     }
 
     fn update_selection(&mut self) {
-        self.col = self.col.min(self.lists.len().saturating_sub(1));
-        self.row = self.row.min(self.lists[self.col].len().saturating_sub(1));
+        self.col = self.col.min(self.cols().saturating_sub(1));
+        self.row = self.row.min(self.rows().saturating_sub(1));
     }
 
     // Selection Motions
@@ -75,7 +99,7 @@ impl App {
 
     // Card Movements
     pub fn move_left(&mut self) {
-        if self.col == 0 || self.row >= self.lists[self.col].len() {
+        if self.col == 0 || self.row >= self.rows() {
             return;
         }
         let t_col = self.col - 1;
@@ -87,7 +111,7 @@ impl App {
     }
     pub fn move_down(&mut self) {
         let t_row = self.row + 1;
-        if t_row >= self.lists[self.col].len() {
+        if t_row >= self.rows() {
             return;
         }
         self.lists[self.col].swap(self.row, t_row);
@@ -95,18 +119,18 @@ impl App {
     }
     pub fn move_up(&mut self) {
         let t_row = self.row.saturating_sub(1);
-        if t_row >= self.lists[self.col].len() {
+        if t_row >= self.rows() {
             return;
         }
         self.lists[self.col].swap(self.row, t_row);
         self.row = t_row;
     }
     pub fn move_right(&mut self) {
-        if self.row >= self.lists[self.col].len() {
+        if self.row >= self.rows() {
             return;
         }
         let t_col = self.col + 1;
-        if t_col >= self.lists.len() {
+        if t_col >= self.cols() {
             return;
         }
         let t_row = self.row.min(self.lists[t_col].len());
@@ -118,7 +142,7 @@ impl App {
 
     // Edit Card
     pub fn edit_card(&mut self) {
-        if self.row >= self.lists[self.col].len() {
+        if self.row >= self.rows() {
             return;
         }
         self.mode = AppMode::CardEdit;
@@ -138,14 +162,14 @@ impl App {
         self.mode = AppMode::Main;
     }
 
-    // Add Card
+    // Add/Remove Card
     fn add_card(&mut self, index: usize) {
         self.lists[self.col].insert(index, String::from("New Card"));
         self.row = index;
         self.edit_card();
     }
     pub fn append_card(&mut self) {
-        let index = (self.row + 1).min(self.lists[self.col].len());
+        let index = (self.row + 1).min(self.rows());
         self.add_card(index);
     }
     pub fn prepend_card(&mut self) {

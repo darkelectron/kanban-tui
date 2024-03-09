@@ -5,7 +5,7 @@ pub fn handle_key_events(ev: KeyEvent, app: &mut App) -> AppResult<()> {
     if ev.kind != KeyEventKind::Press {
         return Ok(());
     }
-    match app.mode {
+    match app.mode() {
         AppMode::Main => match ev.code {
             KeyCode::Char('e') => {
                 app.edit_card();
