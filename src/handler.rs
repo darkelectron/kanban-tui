@@ -7,10 +7,8 @@ pub fn handle_key_events(ev: KeyEvent, app: &mut App) -> AppResult<()> {
     }
     match app.mode() {
         AppMode::Main => match ev.code {
-            KeyCode::Char('e') => {
-                app.edit_card();
-            }
-            // Card Motions
+            // Card Movemenent
+            // HJKL: Move card
             KeyCode::Char('H') | KeyCode::Left if ev.modifiers == KeyModifiers::SHIFT => {
                 app.move_left();
             }
@@ -24,13 +22,16 @@ pub fn handle_key_events(ev: KeyEvent, app: &mut App) -> AppResult<()> {
                 app.move_right()
             }
             // Selection Motions
+            // hjkl: Move cursor
             KeyCode::Char('h') | KeyCode::Left => app.motion_left(),
             KeyCode::Char('j') | KeyCode::Down => app.motion_down(),
             KeyCode::Char('k') | KeyCode::Up => app.motion_up(),
             KeyCode::Char('l') | KeyCode::Right => app.motion_right(),
-            // Append/Prepend/Delete Cards
+            // CRUD Operations on Cards
+            // aiex: Append/Prepend/Edit/Delete a card
             KeyCode::Char('a') => app.append_card(),
             KeyCode::Char('i') => app.prepend_card(),
+            KeyCode::Char('e') => app.edit_card(),
             KeyCode::Char('x') => app.remove_card(),
             // Exit
             KeyCode::Char('q') => app.quit(),
@@ -47,14 +48,10 @@ pub fn handle_key_events(ev: KeyEvent, app: &mut App) -> AppResult<()> {
         _ => {}
     };
     /*
-    hjkl: Move cursor
-    HJKL: Move card
     Ctrl+H Ctrl+L: Move List
 
-    ai: Append/Prepend a card
     AI: Append/Prepend a list
 
-    e: Edit card
     E: Edit List
 
     d: Delete card
@@ -62,8 +59,6 @@ pub fn handle_key_events(ev: KeyEvent, app: &mut App) -> AppResult<()> {
 
     f: fuzzy find card
     F: fuzzy find list
-
-    q Ctrl+c: Exit
     */
     Ok(())
 }

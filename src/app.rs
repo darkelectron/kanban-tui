@@ -1,4 +1,7 @@
-use std::error;
+use std::{
+    error,
+    ops::{Index, IndexMut},
+};
 pub type AppResult<T> = std::result::Result<T, Box<dyn error::Error>>;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -9,9 +12,64 @@ pub enum AppMode {
 }
 
 #[derive(Debug)]
+pub struct CardList {
+    name: String,
+    cards: Vec<String>,
+}
+
+impl CardList {
+    pub fn new() -> Self {
+        Self {
+            name: String::from("New List"),
+            cards: vec![String::from("New Card")],
+        }
+    }
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+    pub fn is_empty(&self) -> bool {
+        self.cards.is_empty()
+    }
+    pub fn len(&self) -> usize {
+        self.cards.len()
+    }
+    pub fn remove(&mut self, index: usize) -> String {
+        self.cards.remove(index)
+    }
+    pub fn insert(&mut self, index: usize, element: String) {
+        self.cards.insert(index, element)
+    }
+    pub fn swap(&mut self, a: usize, b: usize) {
+        self.cards.swap(a, b)
+    }
+    pub fn cards(&self) -> &[String] {
+        &self.cards
+    }
+}
+
+impl Default for CardList {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+impl Index<usize> for CardList {
+    type Output = String;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.cards[index]
+    }
+}
+
+impl IndexMut<usize> for CardList {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        &mut self.cards[index]
+    }
+}
+
+#[derive(Debug)]
 pub struct App {
     running: bool,
-    lists: Vec<Vec<String>>,
+    lists: Vec<CardList>,
     row: usize,
     col: usize,
     mode: AppMode,
@@ -27,13 +85,25 @@ impl Default for App {
             mode: AppMode::Main,
             prev_val: String::new(),
             lists: vec![
-                vec![
-                    String::from("Card 1 in List 1"),
-                    String::from("Card 2 in List 1"),
-                    String::from("Card 3 in List 1"),
-                ],
-                vec![String::from("Card 1 in List 2")],
-                vec![String::from("Absolutly Nothing")],
+                CardList {
+                    name: "List 1".to_string(),
+                    cards: vec![
+                        "Card 1 in List 1".to_string(),
+                        "Card 2 in List 1".to_string(),
+                    ],
+                },
+                CardList {
+                    name: "List 2".to_string(),
+                    cards: vec![
+                        "Card 1 in List 2".to_string(),
+                        "Card 2 in List 2".to_string(),
+                        "Card 3 in List 2".to_string(),
+                    ],
+                },
+                CardList {
+                    name: "List 3".to_string(),
+                    cards: vec!["Card 1 in List 3".to_string()],
+                },
             ],
         }
     }
@@ -46,10 +116,10 @@ impl App {
     pub fn mode(&self) -> AppMode {
         self.mode
     }
-    pub fn lists(&self) -> &[Vec<String>] {
+    pub fn lists(&self) -> &[CardList] {
         &self.lists
     }
-    pub fn list(&self) -> &[String] {
+    pub fn list(&self) -> &CardList {
         &self.lists[self.col]
     }
     pub fn row(&self) -> usize {

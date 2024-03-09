@@ -33,7 +33,7 @@ pub fn render(app: &App, frame: &mut Frame) {
         .enumerate()
         .for_each(|(list_index, list)| {
             frame.render_widget(
-                List::new(list.iter().enumerate().map(|(card_index, card)| {
+                List::new(list.cards().iter().enumerate().map(|(card_index, card)| {
                     let is_selected = card_index == app.row() && list_index == app.col();
                     let mut text = card.clone();
                     if is_selected && app.mode() == AppMode::CardEdit {
@@ -47,7 +47,7 @@ pub fn render(app: &App, frame: &mut Frame) {
                 }))
                 .block(
                     Block::bordered()
-                        .title(Title::from(list_index.to_string()).alignment(Alignment::Left))
+                        .title(Title::from(list.name()).alignment(Alignment::Left))
                         .title(Title::from(list.len().to_string()).alignment(Alignment::Right))
                         .fg(if list_index == app.col() {
                             Color::LightRed
