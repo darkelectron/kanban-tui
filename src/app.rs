@@ -2,6 +2,8 @@ use std::{
     error,
     ops::{Index, IndexMut},
 };
+use crate::db::{read_user_data, User};
+//
 pub type AppResult<T> = std::result::Result<T, Box<dyn error::Error>>;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -15,13 +17,28 @@ pub enum AppMode {
 pub struct CardList {
     name: String,
     cards: Vec<String>,
+    todo: Vec<String>,
 }
+
+// fn getting_data() -> String {
+//     let a: &str = "";
+//     match read_user_data("Jon") {
+//         Ok(user_data) => println!("{:?}", user_data),
+//         Err(_e) => {
+//
+//         }
+//     }
+//
+//     println!("{:?}", user_data);
+//     return user_data.name.to_string();
+// }
 
 impl CardList {
     pub fn new() -> Self {
         Self {
             name: String::from("New List"),
             cards: vec![String::from("New Card")],
+            todo: vec![String::from("list")],
         }
     }
     pub fn name(&self) -> &str {
@@ -44,6 +61,9 @@ impl CardList {
     }
     pub fn cards(&self) -> &[String] {
         &self.cards
+    }
+    pub fn todo(&self) -> &[String] {
+        &self.todo
     }
 }
 
@@ -78,6 +98,34 @@ pub struct App {
 
 impl Default for App {
     fn default() -> Self {
+        let user_data = match read_user_data("Jon") {
+
+            Ok(user_data) => user_data,
+
+            Err(e) => {
+
+                eprintln!("Error reading user data: {}", e);
+
+                // Try to read the user data again or return a default user
+
+                match read_user_data("Jon") {
+
+                    Ok(user_data) => user_data,
+
+                    Err(e) => {
+
+                        eprintln!("Failed to read user data again: {}", e);
+
+                        User { id: 0, name: String::new(), data: String::new() }
+
+                    }
+
+                }
+
+            }
+
+        };
+
         Self {
             running: true,
             row: 0,
@@ -86,23 +134,15 @@ impl Default for App {
             prev_val: String::new(),
             lists: vec![
                 CardList {
-                    name: "List 1".to_string(),
+                    name: user_data.name.to_string(),
                     cards: vec![
-                        "Card 1 in List 1".to_string(),
+                        "Card 1 in List 1".to_string(),  // -
                         "Card 2 in List 1".to_string(),
                     ],
-                },
-                CardList {
-                    name: "List 2".to_string(),
-                    cards: vec![
-                        "Card 1 in List 2".to_string(),
-                        "Card 2 in List 2".to_string(),
-                        "Card 3 in List 2".to_string(),
+                    todo: vec![
+                        "todo 1 in List 1".to_string(),  // -
+                        "todo 2 in List 1".to_string(),
                     ],
-                },
-                CardList {
-                    name: "List 3".to_string(),
-                    cards: vec!["Card 1 in List 3".to_string()],
                 },
             ],
         }
