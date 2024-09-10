@@ -5,7 +5,7 @@ use ratatui::{
     Frame,
 };
 
-use crate::app::{App, AppMode};
+use crate::{app::{App, AppMode}, db::read_board_name, db::Board};
 
 pub fn render(app: &App, frame: &mut Frame) {
     let rects = Layout::vertical([
@@ -15,9 +15,44 @@ pub fn render(app: &App, frame: &mut Frame) {
     ])
     .split(frame.size());
 
+
+    let board_name = match read_board_name("Default") {
+
+        Ok(user_data) => user_data,
+
+        Err(e) => {
+
+            eprintln!("Error reading user data: {}", e);
+
+            // Try to read the user data again or return a default user
+
+            match read_board_name("Jon") {
+
+                Ok(user_data) => user_data,
+
+                Err(e) => {
+
+                    eprintln!("Failed to read user data again: {}", e);
+
+                    Board { id: 0, name: String::new() }
+
+                }
+            }
+        }
+    };
+
     // Header
     frame.render_widget(
-        Paragraph::new("Kanban TUI")
+        Paragraph::new("Kanban 🦀 TUI")
+            .left_aligned()
+            .block(Block::bordered()),
+        rects[0],
+    );
+
+    let name = format!("📋️ {}", board_name.name.to_string());
+
+    frame.render_widget(
+        Paragraph::new(name)
             .centered()
             .block(Block::bordered()),
         rects[0],
@@ -25,7 +60,7 @@ pub fn render(app: &App, frame: &mut Frame) {
 
     // Lists and cards
     // TODO: Slice lists
-    let list_rects = Layout::horizontal(vec![Constraint::Length(40); app.lists().len()])
+    let list_rects = Layout::horizontal(vec![Constraint::Length(100); app.lists().len()])
         .margin(1)
         .spacing(1)
         .split(rects[1]);

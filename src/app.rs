@@ -116,7 +116,7 @@ impl Default for App {
 
                         eprintln!("Failed to read user data again: {}", e);
 
-                        User { id: 0, name: String::new(), data: String::new() }
+                        User { id: 0, name: String::new() }
 
                     }
 

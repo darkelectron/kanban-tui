@@ -9,19 +9,6 @@ use std::io;
 
 fn main() -> AppResult<()> {
     let mut app = App::new();
-    // let _ = create_db();
-    // let _ = insert_user_data("James", "htnoue");
-    // let user_data = read_user_data("John");
-
-    // match read_user_data("Jon") {
-    //     Ok(user_data) => println!("{:?}", user_data),
-    //     Err(_e) => {
-    //
-    //     }
-    // }
-    // for user in user_data {
-    //     println!("{:?}", user);
-    // }
 
     let backend = CrosstermBackend::new(io::stderr());
     let terminal = Terminal::new(backend)?;
