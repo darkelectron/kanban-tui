@@ -60,7 +60,7 @@ pub fn render(app: &App, frame: &mut Frame) {
 
     // Lists and cards
     // TODO: Slice lists
-    let list_rects = Layout::horizontal(vec![Constraint::Length(100); app.lists().len()])
+    let list_rects = Layout::horizontal(vec![Constraint::Percentage(20); app.lists().len()])
         .margin(1)
         .spacing(1)
         .split(rects[1]);
@@ -81,21 +81,22 @@ pub fn render(app: &App, frame: &mut Frame) {
                         text.push('_');
                     }
                     ListItem::new(text).fg(if is_selected {
-                        Color::LightRed
+                        Color::Green
                     } else {
                         Color::White
                     })
-                }))
+                })).highlight_symbol(">>")
                 .block(
                     Block::bordered()
                         .title(Title::from(list_title).alignment(Alignment::Left))
                         .title(Title::from(list.len().to_string()).alignment(Alignment::Right))
                         .fg(if list_index == app.col() {
-                            Color::LightRed
+                            Color::LightBlue
                         } else {
                             Color::White
                         }),
-                ),
+                ).highlight_symbol(">>")
+                .repeat_highlight_symbol(true),
                 list_rects[list_index],
             );
         });
